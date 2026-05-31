@@ -1,0 +1,16 @@
+.env
+.env.local
+.env*.local
+
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+dev.log
+node_modules/
+.vercel/
+
+# Planning docs (kept locally, not in deployment repo)
+*.docx
+*.pdf
