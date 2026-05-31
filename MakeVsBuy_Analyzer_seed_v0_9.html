@@ -3,6 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <script src="/app-env.js"></script>
+<script>
+  /* Single source of truth for the gateway URL. Set BEFORE track.js
+   * loads (track.js reads window.__BOLLONG_GATEWAY) and consumed by
+   * the inline callClaude() further down. Localhost only on dev;
+   * everywhere else hits the production gateway. */
+  window.__BOLLONG_GATEWAY =
+    (window.appEnv && window.appEnv.current() === 'dev')
+      ? 'http://127.0.0.1:4000'
+      : 'https://api.bollong.ai';
+</script>
 <script src="/track.js" data-app="makevsbuy"></script>
 <script>
   /* Config for the anonymous-session quota gate. Must run BEFORE
@@ -16,7 +26,7 @@
 <script src="quota-gate.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Medical Device Make vs Buy Analyzer — seed v0</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; connect-src 'self' http://127.0.0.1:4000 http://localhost:4000; img-src 'self' data: blob:; media-src blob:; worker-src blob:;">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; connect-src 'self' http://127.0.0.1:4000 http://localhost:4000 https://api.bollong.ai; img-src 'self' data: blob:; media-src blob:; worker-src blob:;">
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <style>
@@ -782,7 +792,7 @@ var LOGO_DATA_URL = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAQD
 function ensureLogo(){ return Promise.resolve(LOGO_DATA_URL); }
 
 /* ── Anthropic call (via api-gateway — key lives on the gateway, not in browser) ── */
-var GATEWAY_URL = 'http://127.0.0.1:4000';
+var GATEWAY_URL = window.__BOLLONG_GATEWAY || 'http://127.0.0.1:4000';
 function apiHeaders(){ return {'Content-Type':'application/json'}; }
 function callClaude(messages, maxTokens){
   return fetch(GATEWAY_URL + '/api/anthropic/messages',{
