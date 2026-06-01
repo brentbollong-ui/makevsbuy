@@ -3,6 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <script src="/app-env.js"></script>
+<!-- Sentry browser SDK: captures uncaught JS exceptions + unhandled
+     promise rejections + (off by default) performance traces. Loaded
+     synchronously near the top of head so it can capture errors from
+     the rest of page load. DSN is safe in client code — it identifies
+     the project, not authenticates. -->
+<script src="https://browser.sentry-cdn.com/10.55.0/bundle.min.js" crossorigin="anonymous"></script>
+<script>
+  if (window.Sentry && window.Sentry.init) {
+    Sentry.init({
+      dsn: "https://a3d2d71b95be760d76d0bb51b51d6b56@o4511491686924288.ingest.us.sentry.io/4511492084465664",
+      tracesSampleRate: 0,
+      sendDefaultPii: false,
+      /* Environment tagged via app-env.js detection (dev/test/live) so
+       * we can filter Sentry by which env the error came from. */
+      environment: (window.appEnv && window.appEnv.current && window.appEnv.current()) || "live",
+      ignoreErrors: [
+        /ResizeObserver loop limit exceeded/,
+        /ResizeObserver loop completed with undelivered notifications/,
+        /Non-Error promise rejection captured/,
+        /AbortError: The user aborted a request/,
+      ],
+    });
+  }
+</script>
 <script>
   /* Single source of truth for the gateway URL. Set BEFORE track.js
    * loads (track.js reads window.__BOLLONG_GATEWAY) and consumed by
@@ -26,7 +50,7 @@
 <script src="quota-gate.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Medical Device Make vs Buy Analyzer — seed v0</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; connect-src 'self' http://127.0.0.1:4000 http://localhost:4000 https://api.bollong.ai; img-src 'self' data: blob:; media-src blob:; worker-src blob:;">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://browser.sentry-cdn.com; connect-src 'self' http://127.0.0.1:4000 http://localhost:4000 https://api.bollong.ai https://*.ingest.us.sentry.io; img-src 'self' data: blob:; media-src blob:; worker-src blob:;">
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <style>
